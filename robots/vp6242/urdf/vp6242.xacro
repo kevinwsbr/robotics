@@ -1,0 +1,7 @@
+<?xml version="1.0" ?>
+
+<!-- <robot name="vp6242" xmlns:xacro="http://ros.org/wiki/xacro"> -->
+<robot name="vp6242" xmlns:xacro="http://www.ros.org/wiki/xacro">
+	<xacro:include filename="$(find vp6242_description)/urdf/vp6242_macro.xacro"/>
+	<xacro:vp6242 prefix=""/>
+</robot>
