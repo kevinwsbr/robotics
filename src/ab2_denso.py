@@ -222,7 +222,7 @@ while np.linalg.norm(goal_pose - robot_pose) >= tol:
     robot_pose = extractPose(T)
     current.append(robot_pose)
 
-    # plotData(current, goal)
+    plotData(current, goal)
 
 sim.stopSimulation()
 plt.show()
