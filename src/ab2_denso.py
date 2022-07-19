@@ -156,37 +156,52 @@ def getMatrix(objectHandler):
                     [0, 0, 0, 1]])
 
 
-def plotData(current, goal):
-    axis[0, 0].plot(np.array(current)[:, 0], linestyle='--', color='royalblue')
-    axis[0, 0].plot(np.array(goal)[:, 0], linestyle='-', color='slategray')
-    axis[0, 0].set_title('X')
+def plotUniqueLegend():
+    handles, labels = axis.get_legend_handles_labels()
+    unique = [(h, l) for i, (h, l) in enumerate(zip(handles, labels)) if l not in labels[:i]]
+    axis.legend(*zip(*unique))
 
-    axis[0, 1].plot(np.array(current)[:, 1], linestyle='--', color='royalblue')
-    axis[0, 1].plot(np.array(goal)[:, 1], linestyle='-', color='slategray')
-    axis[0, 1].set_title('Y')
 
-    axis[0, 2].plot(np.array(current)[:, 2], linestyle='--', color='royalblue')
-    axis[0, 2].plot(np.array(goal)[:, 2], linestyle='-', color='slategray')
-    axis[0, 2].set_title('Z')
+def plotError(current, goal):
+    plt.plot(np.array(current)[:, 0] - np.array(goal)[:, 0], linestyle='-', label='x', color='C0')
+    plt.plot(np.array(current)[:, 1] - np.array(goal)[:, 1], linestyle='-', label='y', color='C1')
+    plt.plot(np.array(current)[:, 2] - np.array(goal)[:, 2], linestyle='-', label='z', color='C2')
+    plt.plot(np.array(current)[:, 3] - np.array(goal)[:, 3], linestyle='-', label='roll', color='C3')
+    plt.plot(np.array(current)[:, 4] - np.array(goal)[:, 4], linestyle='-', label='pitch', color='C4')
+    plt.plot(np.array(current)[:, 5] - np.array(goal)[:, 5], linestyle='-', label='yaw', color='C5')
 
-    axis[1, 0].plot(np.array(current)[:, 3], linestyle='--', color='royalblue')
-    axis[1, 0].plot(np.array(goal)[:, 3], linestyle='-', color='slategray')
-    axis[1, 0].set_title('Roll')
+    plotUniqueLegend()
 
-    axis[1, 1].plot(np.array(current)[:, 4], linestyle='--', color='royalblue')
-    axis[1, 1].plot(np.array(goal)[:, 4], linestyle='-', color='slategray')
-    axis[1, 1].set_title('Pitch')
-
-    axis[1, 2].plot(np.array(current)[:, 5], linestyle='--', color='royalblue')
-    axis[1, 2].plot(np.array(goal)[:, 5], linestyle='-', color='slategray')
-    axis[1, 2].set_title('Yaw')
+    plt.title('Erro - Pose')
 
     plt.pause(dt)
 
+def plotAngles(angles):
+    axis[0, 0].plot(np.array(angles)[:, 0], linestyle='-', color='royalblue')
+    axis[0, 0].set_title('Junta 1')
 
-figure, axis = plt.subplots(2, 3)
+    axis[0, 1].plot(np.array(angles)[:, 1], linestyle='-', color='royalblue')
+    axis[0, 1].set_title('Junta 2')
+
+    axis[0, 2].plot(np.array(angles)[:, 2], linestyle='-', color='royalblue')
+    axis[0, 2].set_title('Junta 3')
+
+    axis[1, 0].plot(np.array(angles)[:, 3], linestyle='-', color='royalblue')
+    axis[1, 0].set_title('Junta 4')
+
+    axis[1, 1].plot(np.array(angles)[:, 4], linestyle='-', color='royalblue')
+    axis[1, 1].set_title('Junta 5')
+
+    axis[1, 2].plot(np.array(angles)[:, 5], linestyle='-', color='royalblue')
+    axis[1, 2].set_title('Junta 6')
+
+    plt.pause(dt)
+
+# figure, axis = plt.subplots()
+# figure, axis = plt.subplots(2, 3)
 goal = []
 current = []
+angles = []
 
 client = RemoteAPIClient()
 sim = client.getObject('sim')
@@ -207,6 +222,7 @@ robot_pose = extractPose(T)
 while np.linalg.norm(goal_pose - robot_pose) >= tol:
     goal_pose = extractPose(getMatrix(dummyHandler))
     goal.append(goal_pose)
+    angles.append(pos)
 
     J = jacobian(pos[0], pos[1], pos[2], pos[3], pos[4], pos[5])
     J_cross = np.linalg.pinv(J)
@@ -222,7 +238,8 @@ while np.linalg.norm(goal_pose - robot_pose) >= tol:
     robot_pose = extractPose(T)
     current.append(robot_pose)
 
-    plotData(current, goal)
+    # plotError(current, goal)
+    # plotAngles(angles)
 
 sim.stopSimulation()
 plt.show()
